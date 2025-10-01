@@ -10,7 +10,7 @@ const InputChat = () => {
                 placeholder="Tuliskan pertanyaanmu disini..."
             />
             <div className="flex justify-end mt-3">
-                <Button size="icon"><SendHorizontal /></Button>
+                <Button><SendHorizontal /> Kirim</Button>
             </div>
         </div>
     )

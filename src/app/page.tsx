@@ -1,5 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar"
 import Header from "@/components/header"
+import Chat from "@/components/pages/home/chat"
 import InputChat from "@/components/pages/home/input-chat"
 import Introduce from "@/components/pages/home/introduce"
 import {
@@ -7,20 +8,19 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 
-export default function Page() {
+export default function HomePage() {
+
   return (
     <SidebarProvider>
       {/* <AppSidebar /> */}
       <SidebarInset>
         <Header />
 
-        <div className={`w-full lg:max-w-3xl mx-auto relative flex flex-col ${!true ? "" : "my-auto"}`}>
-          {!true ? (
+        <div className={`w-full lg:max-w-3xl mx-auto relative flex flex-col ${true ? "" : "my-auto"}`}>
+          {true ? (
             <>
               <main className="p-4 flex-1 overflow-y-auto pb-32">
-                <div className="mb-2">
-                  Chat muncul disini
-                </div>
+                <Chat />
               </main>
 
               <div className="fixed bottom-0 left-0 right-0 bg-background">
