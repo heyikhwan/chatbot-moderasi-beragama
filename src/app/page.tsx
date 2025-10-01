@@ -16,7 +16,7 @@ export default function HomePage() {
       <SidebarInset>
         <Header />
 
-        <div className={`w-full lg:max-w-3xl mx-auto relative flex flex-col ${true ? "" : "my-auto"}`}>
+        <div className={`w-full lg:max-w-3xl mx-auto flex flex-col ${true ? "" : "my-auto"}`}>
           {true ? (
             <>
               <main className="p-4 flex-1 overflow-y-auto pb-32">
