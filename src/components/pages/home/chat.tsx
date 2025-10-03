@@ -1,16 +1,25 @@
+import { TriangleAlert } from "lucide-react";
+import { useEffect, useRef } from "react";
+
 type ChatProps = {
-    messages: { content: string; role: "user" | "bot" }[]
+    messages: { success: boolean; content: string; role: "user" | "bot" }[]
     isTyping: boolean
 }
 
 const Chat = ({ messages, isTyping }: ChatProps) => {
+    const chatEndRef = useRef<HTMLDivElement | null>(null)
+
+    useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [messages, isTyping])
+
     return (
         <div className="mb-2">
             {messages.map((item, index) => (
                 <div key={index} className={`flex ${item.role === "user" ? "justify-end" : "justify-start"} mb-2`}>
                     <div className={`flex flex-col ${item.role === "user" ? "items-end" : "items-start"}`}>
                         <div className={`${item.role === "user" ? "bg-input" : "bg-none"} rounded-4xl py-2.5 px-4`}>
-                            <p>{item.content}</p>
+                            <p className={`flex items-center gap-2 ${!item.success && "text-destructive"}`}> {!item.success && <TriangleAlert className="w-4 h-4" />} {item.content}</p>
                         </div>
                     </div>
                 </div>
@@ -25,6 +34,8 @@ const Chat = ({ messages, isTyping }: ChatProps) => {
                     </div>
                 </div>
             )}
+
+            <div ref={chatEndRef} />
         </div>
     )
 }
