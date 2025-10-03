@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Modera AI",
+  title: "Modera AI - Universitas Islam Negeri Sultan Syarif Kasim Riau",
   description: "Mendukung sikap toleran, inklusif, dan saling menghargai di tengah keberagaman",
 };
 
