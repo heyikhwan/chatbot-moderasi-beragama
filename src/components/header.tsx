@@ -13,10 +13,10 @@ import Link from 'next/link'
 const Header = () => {
     const { user } = useUser()
 
-    const handleLogout = () => {
-        fetch("/api/auth/logout")
-        window.location.href = "/"
-    }
+    const handleLogout = async () => {
+        await fetch("/api/auth/logout", { method: "GET" });
+        window.location.href = "/";
+    };
 
     return (
         <header className="bg-background sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b px-4 z-50">
