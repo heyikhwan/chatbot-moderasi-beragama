@@ -6,6 +6,8 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+export const dynamic = 'force-dynamic';
+
 const LoginPage = () => {
     const searchParams = useSearchParams();
     const errorMessage = searchParams.get("error");
