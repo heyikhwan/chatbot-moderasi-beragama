@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique @db.VarChar(255)
+  name        String    @db.VarChar(100)
+  image       String?   @db.Text
+  provider    String    @db.VarChar(50)
+  bannedUntil DateTime? @db.DateTime()
+  role        String    @default("user") @db.VarChar(50)
+  createdAt   DateTime  @default(now())
+  updateAt    DateTime  @updatedAt
+}
