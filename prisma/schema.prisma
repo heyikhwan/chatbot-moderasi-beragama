@@ -8,14 +8,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Sentiment {
+  POSITIVE
+  NEGATIVE
+}
+
+enum Role {
+  user
+  bot
+}
+
 model User {
-  id          String    @id @default(cuid())
-  email       String    @unique @db.VarChar(255)
-  name        String    @db.VarChar(100)
-  image       String?   @db.Text
-  provider    String    @db.VarChar(50)
-  bannedUntil DateTime? @db.DateTime()
-  role        String    @default("user") @db.VarChar(50)
-  createdAt   DateTime  @default(now())
-  updateAt    DateTime  @updatedAt
+  id           String        @id @default(cuid())
+  email        String        @unique @db.VarChar(255)
+  name         String        @db.VarChar(100)
+  image        String?       @db.Text
+  provider     String        @db.VarChar(50)
+  bannedUntil  DateTime?     @db.DateTime()
+  role         String        @default("user") @db.VarChar(50)
+  createdAt    DateTime      @default(now())
+  updateAt     DateTime      @updatedAt
+  ChatSessions ChatSession[]
+}
+
+model ChatSession {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  deletedAt DateTime? @db.DateTime()
+  chats     Chat[]
+}
+
+model Chat {
+  id            String      @id @default(cuid())
+  chatSessionId String
+  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
+  content       String      @db.Text
+  role          Role
+  sentiment     Sentiment?
+  createdAt     DateTime    @default(now())
 }

@@ -3,11 +3,12 @@ import { TypingEffect } from "@/components/typing-effect";
 import { TriangleAlert } from "lucide-react";
 
 type ChatProps = {
-    messages: { success: boolean; content: string; role: "user" | "bot" }[];
+    messages: { success: boolean; content: string; role: "user" | "bot"; isNew?: boolean }[];
     isTyping: boolean;
+    isWaitingResponse: boolean;
 };
 
-const Chat = ({ messages, isTyping }: ChatProps) => {
+const Chat = ({ messages, isTyping, isWaitingResponse }: ChatProps) => {
     const chatEndRef = useRef<HTMLDivElement | null>(null);
     const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -46,7 +47,7 @@ const Chat = ({ messages, isTyping }: ChatProps) => {
                         <div className={`${item.role === "user" ? "bg-input" : "bg-none"} rounded-4xl py-2.5 px-4`}>
                             <p className={`flex items-center gap-2 ${!item.success && "text-destructive"}`}>
                                 {!item.success && <TriangleAlert className="w-4 h-4" />}
-                                {item.role === "bot" && item.success ? (
+                                {item.role === "bot" && item.success && item.isNew ? (
                                     <TypingEffect text={item.content} />
                                 ) : (
                                     item.content
@@ -57,7 +58,7 @@ const Chat = ({ messages, isTyping }: ChatProps) => {
                 </div>
             ))}
 
-            {isTyping && (
+            {isWaitingResponse && (
                 <div className="flex justify-start mb-2">
                     <div className="bg-muted rounded-4xl py-2.5 px-4 flex items-center gap-1">
                         <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" />

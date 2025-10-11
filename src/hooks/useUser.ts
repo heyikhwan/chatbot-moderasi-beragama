@@ -16,7 +16,7 @@ export function useUser() {
                 } else {
                     setUser(null)
                 }
-            } catch (err) {
+            } catch {
                 setUser(null)
             } finally {
                 setLoading(false)
