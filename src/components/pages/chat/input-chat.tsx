@@ -47,7 +47,7 @@ const InputChat = ({ onSendMessage, isTyping, onDeleteSession, hasMessages }: In
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button variant="ghost" size="icon" disabled={isTyping}>
-                                <Trash2 className="text-destructive" />
+                                <Trash2 className="text-muted-foreground" />
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>

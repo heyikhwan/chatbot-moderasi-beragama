@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Suspense } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 function LoginContent() {
     const searchParams = useSearchParams();
@@ -50,7 +51,7 @@ function LoginContent() {
 
 export default function LoginPage() {
     return (
-        <Suspense fallback={<div className="text-center p-8">Memuat...</div>}>
+        <Suspense fallback={<div className="text-center p-8 flex items-center justify-center gap-2"><Spinner /> Tunggu Sebentar...</div>}>
             <LoginContent />
         </Suspense>
     );

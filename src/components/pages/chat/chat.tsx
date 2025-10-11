@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { TypingEffect } from "@/components/typing-effect";
-import { TriangleAlert } from "lucide-react";
+import { Bot, TriangleAlert } from "lucide-react";
 
 type ChatProps = {
     messages: { success: boolean; content: string; role: "user" | "bot"; isNew?: boolean }[];
@@ -42,17 +42,28 @@ const Chat = ({ messages, isTyping, isWaitingResponse }: ChatProps) => {
     return (
         <div ref={chatContainerRef} className="chat-container mb-2">
             {messages.map((item, index) => (
-                <div key={index} className={`flex ${item.role === "user" ? "justify-end" : "justify-start"} mb-2`}>
-                    <div className={`flex flex-col ${item.role === "user" ? "items-end" : "items-start"}`}>
-                        <div className={`${item.role === "user" ? "bg-input" : "bg-none"} rounded-4xl py-2.5 px-4`}>
-                            <p className={`flex items-center gap-2 ${!item.success && "text-destructive"}`}>
-                                {!item.success && <TriangleAlert className="w-4 h-4" />}
-                                {item.role === "bot" && item.success && item.isNew ? (
-                                    <TypingEffect text={item.content} />
-                                ) : (
-                                    item.content
+                <div key={index} className={`flex ${item.role === "user" ? "justify-end" : "justify-start"} mb-5`}>
+                    <div className={`flex flex-col ${item.role === "user" ? "items-end" : "items-start"} max-w-[80%]`}>
+                        <div
+                            className={`${
+                                item.role === "user"
+                                    ? "bg-input text-foreground"
+                                    : "bg-none"
+                            } rounded-xl py-2.5 px-4`}
+                        >
+                            <div className={`flex items-start gap-3 ${!item.success && "text-destructive"}`}>
+                                {!item.success && <TriangleAlert className="w-4 h-4 flex-shrink-0 mt-1" />}
+                                {item.role === "bot" && (
+                                    <Bot className="w-6 h-6 flex-shrink-0 text-muted-foreground" />
                                 )}
-                            </p>
+                                <div className="flex-1">
+                                    {item.role === "bot" && item.success && item.isNew ? (
+                                        <TypingEffect text={item.content} />
+                                    ) : (
+                                        <span>{item.content}</span>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

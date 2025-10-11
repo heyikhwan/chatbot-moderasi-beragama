@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Chat from './chat'
 import InputChat from './input-chat'
 import { useUser } from "@/hooks/useUser"
+import { Spinner } from '@/components/ui/spinner'
 
 const ChatBot = () => {
     const { user, loading: userLoading } = useUser()
@@ -89,7 +90,7 @@ const ChatBot = () => {
         <div className="w-full lg:max-w-3xl mx-auto flex flex-col min-h-[calc(100vh-64px)]">
             {isLoading || userLoading ? (
                 <div className="flex flex-1 items-center justify-center h-screen">
-                    <div className="text-center">Memuat...</div>
+                    <div className="text-center flex items-center justify-center gap-2"><Spinner /> Tunggu Sebentar...</div>
                 </div>
             ) : messages.length > 0 ? (
                 <>

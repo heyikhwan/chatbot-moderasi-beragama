@@ -33,12 +33,12 @@ const Header = () => {
                 <div>
                     <div className="flex items-center justify-center gap-3">
                         <Bot className="h-8 w-8 md:h-10 md:w-10" />
-                        {!isMobile && (
-                            <div className="flex flex-col gap-0">
+                        <div className="flex flex-col gap-0">
                                 <h1 className="font-bold md:text-xl">Modera AI</h1>
+                            {!isMobile && (
                                 <small className="text-muted-foreground -mt-1">Universitas Islam Negeri Sultan Syarif Kasim Riau</small>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
