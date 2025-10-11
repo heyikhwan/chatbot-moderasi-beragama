@@ -13,7 +13,7 @@ export default function ChatPage() {
     const { user } = useUser()
     return (
         <SidebarProvider>
-            {user && <AppSidebar />}
+            {/* {user && <AppSidebar />} */}
             <SidebarInset>
                 <Header />
 
