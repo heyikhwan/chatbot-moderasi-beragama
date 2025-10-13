@@ -9,8 +9,9 @@ datasource db {
 }
 
 enum Sentiment {
-  POSITIVE
-  NEGATIVE
+  positif
+  negatif
+  netral
 }
 
 enum Role {
@@ -35,6 +36,7 @@ model ChatSession {
   id        String    @id @default(cuid())
   userId    String
   user      User      @relation(fields: [userId], references: [id])
+  title     String
   createdAt DateTime  @default(now())
   deletedAt DateTime? @db.DateTime()
   chats     Chat[]
@@ -46,6 +48,6 @@ model Chat {
   chatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
   content       String      @db.Text
   role          Role
-  sentiment     Sentiment?
+  sentiment     Sentiment?  @default(positif)
   createdAt     DateTime    @default(now())
 }
