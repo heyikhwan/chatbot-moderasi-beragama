@@ -22,12 +22,12 @@ const Header = () => {
 
     return (
         <header className="bg-background sticky top-0 flex h-16 shrink-0 items-center gap-2 border-b px-4 z-50">
-            {/* {user && (
+            {user && (
                 <>
                     <SidebarTrigger className="-ml-1 cursor-pointer" />
                     <Separator orientation="vertical" className="h-6" />
                 </>
-            )} */}
+            )}
 
             <div className="flex items-center justify-between w-full px-2">
                 <div>

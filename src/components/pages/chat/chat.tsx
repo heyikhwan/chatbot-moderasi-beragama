@@ -3,9 +3,9 @@ import { TypingEffect } from "@/components/typing-effect";
 import { Bot, TriangleAlert } from "lucide-react";
 
 type ChatProps = {
-    messages: { success: boolean; content: string; role: "user" | "bot"; isNew?: boolean }[];
-    isTyping: boolean;
-    isWaitingResponse: boolean;
+  messages: { success: boolean; content: string; role: "user" | "bot"; sentiment?: string; isNew?: boolean }[];
+  isTyping: boolean;
+  isWaitingResponse: boolean;
 };
 
 const Chat = ({ messages, isTyping, isWaitingResponse }: ChatProps) => {

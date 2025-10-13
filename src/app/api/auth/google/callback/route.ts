@@ -89,7 +89,6 @@ export async function GET(req: Request) {
 
         return res;
     } catch (err) {
-        console.error("Auth error:", err);
         const error = encodeURIComponent("Terjadi kesalahan saat login");
         return NextResponse.redirect(new URL(`/auth/login?error=${error}`, req.url));
     }

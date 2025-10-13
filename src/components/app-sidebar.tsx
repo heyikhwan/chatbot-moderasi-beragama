@@ -9,49 +9,53 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/sidebar";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useChatStore } from "@/stores/chatStore";
 
-const data = {
-  navMain: [
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { sessions, selectedSessionId, setSelectedSessionId, addSession } = useChatStore();
+
+  const createNewSession = () => {
+    const tempId = crypto.randomUUID();
+    addSession({ id: tempId, title: "Obrolan Baru", chats: [] });
+    setSelectedSessionId(tempId);
+  };
+
+  const navMain = [
     {
       title: "Riwayat Obrolan",
       url: "#",
-      items: [
-        {
-          title: "Halo!",
-          url: "#",
-          isActive: true
-        },
-        {
-          title: "Greeting",
-          url: "#",
-          isActive: false
-        },
-      ],
-    }
-  ],
-}
+      items: sessions.map((s) => ({
+        title: s.title,
+        url: "#",
+        isActive: s.id === selectedSessionId,
+      })),
+    },
+  ];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <div className="text-center py-3">
-          <Button variant="outline" size="sm" className="w-full cursor-pointer rounded"><Plus /> Obrolan Baru</Button>
+          <Button variant="outline" size="sm" className="w-full cursor-pointer rounded" onClick={createNewSession}>
+            <Plus /> Obrolan Baru
+          </Button>
         </div>
       </SidebarHeader>
       <SidebarContent className="gap-0">
-        {data.navMain.map((item) => (
-          <SidebarGroup key={item.title}>
+        {navMain.map((item, index) => (
+          <SidebarGroup key={index}>
             <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {item.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
+                {item.items.map((item, index) => (
+                  <SidebarMenuItem key={index}>
                     <SidebarMenuButton asChild isActive={item.isActive}>
-                      <a href={item.url}>{item.title}</a>
+                      <a href={item.url} onClick={() => setSelectedSessionId(sessions[index].id)}>
+                        {item.title}
+                      </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -62,5 +66,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
