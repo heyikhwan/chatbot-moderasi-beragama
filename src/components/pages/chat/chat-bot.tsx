@@ -70,7 +70,6 @@ const ChatBot = () => {
             });
             const { chatSessionId, title } = await res.json();
             if (!chatSessionId) {
-                console.error("Failed to create session: No chatSessionId returned");
                 return;
             }
             addSession({ id: chatSessionId, title, chats: [], temp: false });
@@ -86,7 +85,6 @@ const ChatBot = () => {
                 });
                 const { chatSessionId, title } = await res.json();
                 if (!chatSessionId) {
-                    console.error("Failed to create session: No chatSessionId returned");
                     return;
                 }
                 setSessions(sessions.map(s => s.id === selectedSessionId ? { ...s, id: chatSessionId, temp: false, title } : s));

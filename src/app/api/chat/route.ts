@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 
+// TODO: tambah query session id agar ketika refresh dia ga pindah chat (app-sidebar)
+// TODO: ketika klik tombol tambah obrolan baru, urutannya di paling atas, hilangkan # di url nya
+
 export async function GET(req: Request) {
     try {
         const session = await getServerSession();
@@ -29,7 +32,6 @@ export async function GET(req: Request) {
 
         return NextResponse.json({ sessions });
     } catch (error) {
-        console.error("GET session error:", error);
         return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
     }
 }
@@ -172,7 +174,6 @@ export async function DELETE(req: Request) {
 
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error("DELETE /api/chat error:", error);
         return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
     }
 }
