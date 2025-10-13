@@ -57,16 +57,10 @@ const ChatBot = () => {
         fetchSessions();
     }, [user, userLoading, setSessions, setSelectedSessionId]);
 
-    const createNewSession = () => {
-        const tempId = crypto.randomUUID();
-        addSession({ id: tempId, title: "Obrolan Baru", chats: [] });
-        setSelectedSessionId(tempId);
-    };
-
     const handleSendMessage = async (text: string) => {
         if (!text.trim() || !user || userLoading) return;
 
-        let currentSessionId: string; // Ubah tipe ke string saja
+        let currentSessionId: string;
         if (!selectedSessionId) {
             const res = await fetch("/api/chat", {
                 method: "POST",
@@ -75,7 +69,6 @@ const ChatBot = () => {
             });
             const { chatSessionId, title } = await res.json();
             if (!chatSessionId) {
-                console.error("Failed to create session: No chatSessionId returned");
                 return;
             }
             addSession({ id: chatSessionId, title, chats: [], temp: false });
@@ -91,14 +84,13 @@ const ChatBot = () => {
                 });
                 const { chatSessionId, title } = await res.json();
                 if (!chatSessionId) {
-                    console.error("Failed to create session: No chatSessionId returned");
                     return;
                 }
                 setSessions(sessions.map(s => s.id === selectedSessionId ? { ...s, id: chatSessionId, temp: false, title } : s));
                 currentSessionId = chatSessionId;
                 setSelectedSessionId(chatSessionId);
             } else {
-                currentSessionId = selectedSessionId; // selectedSessionId pasti string di sini
+                currentSessionId = selectedSessionId;
             }
         }
 
@@ -117,7 +109,6 @@ const ChatBot = () => {
             });
             const data = await res.json();
             if (!res.ok) {
-                console.error("API error:", data);
                 updateSessionMessages(currentSessionId, [
                     ...newMessages,
                     { success: false, content: data.error || "Maaf, terjadi kesalahan", role: "bot" as const, isNew: true },
@@ -140,7 +131,6 @@ const ChatBot = () => {
                 idx === updatedMessages.length - 1 ? { ...msg, isNew: false } : msg
             ));
         } catch (error) {
-            console.error("handleSendMessage error:", error);
             updateSessionMessages(currentSessionId, [
                 ...newMessages,
                 { success: false, content: "Maaf, terjadi kesalahan", role: "bot" as const, isNew: true },
@@ -152,7 +142,7 @@ const ChatBot = () => {
     };
 
     const handleDeleteSession = async () => {
-        if (!selectedSessionId) return; // Keluar jika null
+        if (!selectedSessionId) return;
 
         if (!sessions.find(s => s.id === selectedSessionId)?.temp) {
             await fetch("/api/chat", {

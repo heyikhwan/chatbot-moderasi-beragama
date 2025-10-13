@@ -29,7 +29,6 @@ export async function GET(req: Request) {
 
         return NextResponse.json({ sessions });
     } catch (error) {
-        console.error("Get session error:", error);
         return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
     }
 }
@@ -81,7 +80,6 @@ export async function POST(req: Request) {
             where: { id: currentSessionId },
         });
         if (!sessionExists) {
-            console.error("Invalid chatSessionId:", currentSessionId);
             return NextResponse.json({ error: "Sesi tidak valid" }, { status: 400 });
         }
 
@@ -101,7 +99,6 @@ export async function POST(req: Request) {
         });
         if (!res.ok) {
             const errorData = await res.json();
-            console.error("Predict API error:", errorData);
             return NextResponse.json({ error: "Gagal mendapatkan respons dari API", details: errorData }, { status: 500 });
         }
 
