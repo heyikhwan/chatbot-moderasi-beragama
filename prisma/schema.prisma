@@ -15,12 +15,12 @@ model chat {
   role          chat_role
   sentiment     chat_sentiment? @default(positif)
   createdAt     DateTime        @default(now())
-  chatsession   chatsession     @relation(fields: [chatSessionId], references: [id], map: "Chat_chatSessionId_fkey")
+  chatSession   chatSession     @relation(fields: [chatSessionId], references: [id], map: "Chat_chatSessionId_fkey")
 
   @@index([chatSessionId], map: "Chat_chatSessionId_fkey")
 }
 
-model chatsession {
+model chatSession {
   id        String    @id @default(cuid())
   userId    String
   createdAt DateTime  @default(now())
@@ -42,7 +42,7 @@ model user {
   role        String        @default("user") @db.VarChar(50)
   createdAt   DateTime      @default(now())
   updateAt    DateTime      @default(now())
-  chatsession chatsession[]
+  chatSession chatSession[]
 }
 
 enum chat_role {
