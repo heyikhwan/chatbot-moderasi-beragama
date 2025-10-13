@@ -9,7 +9,7 @@ datasource db {
 }
 
 model chat {
-  id            String          @id
+  id            String          @id @default(cuid())
   chatSessionId String
   content       String          @db.Text
   role          chat_role
@@ -21,7 +21,7 @@ model chat {
 }
 
 model chatsession {
-  id        String    @id
+  id        String    @id @default(cuid())
   userId    String
   createdAt DateTime  @default(now())
   deletedAt DateTime? @db.DateTime(0)
@@ -33,7 +33,7 @@ model chatsession {
 }
 
 model user {
-  id          String        @id
+  id          String        @id @default(cuid())
   email       String        @unique(map: "User_email_key") @db.VarChar(255)
   name        String        @db.VarChar(100)
   image       String?       @db.Text
@@ -41,7 +41,7 @@ model user {
   bannedUntil DateTime?     @db.DateTime(0)
   role        String        @default("user") @db.VarChar(50)
   createdAt   DateTime      @default(now())
-  updateAt    DateTime
+  updateAt    DateTime      @default(now())
   chatsession chatsession[]
 }
 
