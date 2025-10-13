@@ -27,11 +27,28 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      const res = NextResponse.json(
+        { error: "User not found", redirectTo: "/login" },
+        { status: 404 }
+      );
+      res.cookies.set("token", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        expires: new Date(0),
+      });
+      return res;
     }
 
     return NextResponse.json({ user });
   } catch (err) {
-    return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
+    const res = NextResponse.json({ error: "Invalid or expired token" }, { status: 401 });
+    res.cookies.set("token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      expires: new Date(0),
+    });
+    return res;
   }
 }
