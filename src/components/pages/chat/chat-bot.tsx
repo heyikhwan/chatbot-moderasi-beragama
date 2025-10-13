@@ -39,7 +39,7 @@ const ChatBot = () => {
           if (sessions.length > 0) {
             setSelectedSessionId(sessions[0].id);
           } else {
-            setSelectedSessionId(null); // Reset jika tidak ada sesi
+            setSelectedSessionId(null);
           }
         } catch {
           setSessions([
@@ -101,6 +101,7 @@ const ChatBot = () => {
     ];
     updateSessionMessages(currentSessionId, newMessages);
     setIsWaitingResponse(true);
+    setIsTypingEffect(false);
 
     try {
       const res = await fetch("/api/chat", {
@@ -126,17 +127,19 @@ const ChatBot = () => {
         updateSessionTitle(currentSessionId, text.slice(0, 20) || "Obrolan Baru");
       }
 
+      setIsWaitingResponse(false);
+      setIsTypingEffect(true);
       const typingDuration = data.response.length * 40;
       await new Promise((resolve) => setTimeout(resolve, typingDuration));
       updateSessionMessages(currentSessionId, updatedMessages.map((msg, idx) =>
         idx === updatedMessages.length - 1 ? { ...msg, isNew: false } : msg
       ));
+      setIsTypingEffect(false);
     } catch (error) {
       updateSessionMessages(currentSessionId, [
         ...newMessages,
         { success: false, content: "Maaf, terjadi kesalahan", role: "bot" as const, isNew: true },
       ]);
-    } finally {
       setIsWaitingResponse(false);
       setIsTypingEffect(false);
     }
