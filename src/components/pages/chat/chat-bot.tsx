@@ -70,6 +70,7 @@ const ChatBot = () => {
             });
             const { chatSessionId, title } = await res.json();
             if (!chatSessionId) {
+                console.error("Failed to create session: No chatSessionId returned");
                 return;
             }
             addSession({ id: chatSessionId, title, chats: [], temp: false });
@@ -85,6 +86,7 @@ const ChatBot = () => {
                 });
                 const { chatSessionId, title } = await res.json();
                 if (!chatSessionId) {
+                    console.error("Failed to create session: No chatSessionId returned");
                     return;
                 }
                 setSessions(sessions.map(s => s.id === selectedSessionId ? { ...s, id: chatSessionId, temp: false, title } : s));
@@ -111,6 +113,15 @@ const ChatBot = () => {
             });
             const data = await res.json();
             if (!res.ok) {
+                if (res.status === 403 && data.redirectTo) {
+                    // Lakukan POST ke logout endpoint
+                    await fetch("/api/auth/logout", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                    });
+                    window.location.href = "/auth/login?error=Akun Anda diblokir."; 
+                    return;
+                }
                 updateSessionMessages(currentSessionId, [
                     ...newMessages,
                     { success: false, content: data.error || "Maaf, terjadi kesalahan", role: "bot" as const, isNew: true },

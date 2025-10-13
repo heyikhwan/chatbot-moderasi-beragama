@@ -66,7 +66,7 @@ export async function GET(req: Request) {
                 dateStyle: "long",
                 timeStyle: "short",
             });
-            const error = encodeURIComponent(`Akun Anda diblokir sampai ${bannedUntil}`);
+            const error = encodeURIComponent(`Akun Anda diblokir sampai ${bannedUntil} WIB.`);
             return NextResponse.redirect(new URL(`/auth/login?error=${error}`, req.url));
         }
 

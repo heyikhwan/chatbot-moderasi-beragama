@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { TypingEffect } from "@/components/typing-effect";
-import { Bot, TriangleAlert } from "lucide-react";
+import { Bot, CircleSlash2, TriangleAlert } from "lucide-react";
 
 type ChatProps = {
   messages: { success: boolean; content: string; role: "user" | "bot"; sentiment?: string; isNew?: boolean }[];
@@ -62,6 +62,10 @@ const Chat = ({ messages, isTyping, isWaitingResponse }: ChatProps) => {
                                     ) : (
                                         <span>{item.content}</span>
                                     )}
+                                    {item.role === "bot" && item.sentiment && item.sentiment == "negatif" && (
+                                    <div className="text-xs text-destructive flex items-center gap-1 mt-3">
+                                        <CircleSlash2 className="w-3 h-3" /> <span>Sentiment {item.sentiment}</span></div>
+                            )}
                                 </div>
                             </div>
                         </div>

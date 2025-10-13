@@ -3,35 +3,35 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 
 export async function GET(req: Request) {
-  try {
-    const session = await getServerSession();
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    try {
+        const session = await getServerSession();
+        if (!session?.user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const activeSessions = await prisma.chatSession.findMany({
+            where: { userId: session.user.id, deletedAt: null },
+            include: { chats: true },
+            orderBy: { createdAt: "desc" },
+        });
+
+        const sessions = activeSessions.map((s) => ({
+            id: s.id,
+            title: s.title,
+            chats: s.chats.map((chat) => ({
+                success: true,
+                content: chat.content,
+                role: chat.role as "user" | "bot",
+                sentiment: chat.sentiment,
+                isNew: false,
+            })),
+        }));
+
+        return NextResponse.json({ sessions });
+    } catch (error) {
+        console.error("GET session error:", error);
+        return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
     }
-
-    const activeSessions = await prisma.chatSession.findMany({
-      where: { userId: session.user.id, deletedAt: null },
-      include: { chats: true },
-      orderBy: { createdAt: "desc" },
-    });
-
-    const sessions = activeSessions.map((s) => ({
-      id: s.id,
-      title: s.title,
-      chats: s.chats.map((chat) => ({
-        success: true,
-        content: chat.content,
-        role: chat.role as "user" | "bot",
-        sentiment: chat.sentiment,
-        isNew: false,
-      })),
-    }));
-
-    return NextResponse.json({ sessions });
-  } catch (error) {
-    console.error("GET session error:", error);
-    return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
-  }
 }
 
 export async function POST(req: Request) {
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
                 chatSessionId: currentSessionId,
                 content: text,
                 role: "user",
-                sentiment: "positif",
+                sentiment: "netral",
             },
         });
 
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
                 chatSessionId: currentSessionId,
                 content: response,
                 role: "bot",
-                sentiment: sentiment || "positif" // TODO: ini masih dummy,
+                sentiment: sentiment
             },
         });
 
@@ -128,13 +128,23 @@ export async function POST(req: Request) {
         const negativeCount = await prisma.chat.count({
             where: { chatSessionId: currentSessionId, sentiment: "negatif" },
         });
-        if (negativeCount >= 3) {
+
+        if (negativeCount % 3 === 0 && negativeCount !== 0) {
+            // tambahkan deletedAt di sesi chat nya
+            await prisma.chatSession.update({
+                where: { id: currentSessionId },
+                data: { deletedAt: new Date() },
+            });
+
             const banDuration = 7 * 24 * 60 * 60 * 1000;
             await prisma.user.update({
                 where: { id: session.user.id },
                 data: { bannedUntil: new Date(Date.now() + banDuration) },
             });
-            return NextResponse.redirect(new URL("/api/auth/logout", req.url));
+            return NextResponse.json(
+                { error: "Akun Anda telah dibanned karena terdeteksi sentimen negatif", redirectTo: "/api/auth/logout" },
+                { status: 403 }
+            );
         }
 
         return NextResponse.json({ response, sentiment, chatSessionId: currentSessionId });
