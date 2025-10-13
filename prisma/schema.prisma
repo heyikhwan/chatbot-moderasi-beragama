@@ -26,7 +26,7 @@ model chatSession {
   createdAt DateTime  @default(now())
   deletedAt DateTime? @db.DateTime(0)
   title     String
-  chat      chat[]
+  chats      chat[]
   user      user      @relation(fields: [userId], references: [id], map: "ChatSession_userId_fkey")
 
   @@index([userId], map: "ChatSession_userId_fkey")
