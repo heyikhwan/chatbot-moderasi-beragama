@@ -3,34 +3,35 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
 
 export async function GET(req: Request) {
-    try {
-        const session = await getServerSession();
-        if (!session?.user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        const activeSessions = await prisma.chatSession.findMany({
-            where: { userId: session.user.id, deletedAt: null },
-            include: { chats: true },
-            orderBy: { createdAt: "desc" },
-        });
-
-        const sessions = activeSessions.map((s) => ({
-            id: s.id,
-            title: s.title,
-            chats: s.chats.map((chat) => ({
-                success: true,
-                content: chat.content,
-                role: chat.role as "user" | "bot",
-                sentiment: chat.sentiment,
-                isNew: false,
-            })),
-        }));
-
-        return NextResponse.json({ sessions });
-    } catch (error) {
-        return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
+  try {
+    const session = await getServerSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const activeSessions = await prisma.chatSession.findMany({
+      where: { userId: session.user.id, deletedAt: null },
+      include: { chats: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const sessions = activeSessions.map((s) => ({
+      id: s.id,
+      title: s.title,
+      chats: s.chats.map((chat) => ({
+        success: true,
+        content: chat.content,
+        role: chat.role as "user" | "bot",
+        sentiment: chat.sentiment,
+        isNew: false,
+      })),
+    }));
+
+    return NextResponse.json({ sessions });
+  } catch (error) {
+    console.error("GET session error:", error);
+    return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {
@@ -151,16 +152,17 @@ export async function DELETE(req: Request) {
 
         const { chatSessionId } = await req.json();
         if (!chatSessionId) {
-            return NextResponse.json({ error: "ID sesi tidak ditemukan" }, { status: 400 });
+            return NextResponse.json({ error: "chatSessionId diperlukan" }, { status: 400 });
         }
 
         await prisma.chatSession.update({
-            where: { id: chatSessionId },
-            data: { deletedAt: new Date() }
+            where: { id: chatSessionId, userId: session.user.id },
+            data: { deletedAt: new Date() },
         });
 
-        return NextResponse.json({ message: "Sesi dihapus" });
+        return NextResponse.json({ success: true });
     } catch (error) {
+        console.error("DELETE /api/chat error:", error);
         return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
     }
 }
