@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/auth";
-
-// TODO: tambah query session id agar ketika refresh dia ga pindah chat (app-sidebar)
-// TODO: ketika klik tombol tambah obrolan baru, urutannya di paling atas, hilangkan # di url nya
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function GET(req: Request) {
     try {
@@ -78,7 +76,6 @@ export async function POST(req: Request) {
             currentSessionId = newSession.id;
         }
 
-        // Validasi chatSessionId
         const sessionExists = await prisma.chatSession.findUnique({
             where: { id: currentSessionId },
         });
@@ -95,17 +92,67 @@ export async function POST(req: Request) {
             },
         });
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/predict`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text }),
-        });
-        if (!res.ok) {
-            const errorData = await res.json();
-            return NextResponse.json({ error: "Gagal mendapatkan respons dari API", details: errorData }, { status: 500 });
+        let response, sentiment;
+
+        try {
+            const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+            const model = genAI.getGenerativeModel({
+                model: "gemini-2.5-flash",
+                systemInstruction: {
+                    role: "system",
+                    parts: [{
+                        text: `Anda adalah bot AI bernama "Modera AI" yang dikembangkan oleh tim riset Universitas Islam Negri Sultan Syarif Kasim Riau.
+                            Tugas utama Anda adalah menjawab pertanyaan tentang moderasi beragama.
+                            - Jika pertanyaan di luar topik, sampaikan bahwa Anda tidak tahu.
+                            - Jawab dengan jujur, ramah, dan singkat, layaknya seorang mahasiswa UIN.
+
+                            Anda **hanya boleh merespon dalam format JSON**. Tidak ada teks tambahan, penjelasan, atau format lain.
+
+                            Struktur JSON yang WAJIB Anda gunakan adalah:
+                            {
+                            "text": "[isi dari input user]",
+                            "response": "[jawaban Anda]",
+                            "sentiment": "[netral|positif|negatif]"
+                            }
+
+                            Penentuan sentimen:
+                            - Sentimen "netral" jika pertanyaan berhubungan spesifik dengan moderasi beragama.
+                            - Sentimen "negatif" jika input adalah ujaran kebencian, perkataan kasar, atau hal buruk lainnya.
+                            - Sentimen "positif" untuk input lainnya (basa-basi, pertanyaan di luar topik yang tidak negatif).`,
+                    }],
+                },
+            });
+            const contents = [{ role: "user", parts: [{ text: text.trim() }] }];
+
+            const result = await model.generateContent({
+                contents,
+                generationConfig: {
+                    temperature: 0.2,
+                    topP: 0.5,
+                    maxOutputTokens: 512,
+                    responseMimeType: "application/json",
+                },
+            });
+            const parsedResponse = JSON.parse(result.response.text());
+            response = parsedResponse.response;
+            sentiment = parsedResponse.sentiment;
+
+            if (sentiment === "netral") {
+                const predictRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/predict`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text }),
+                });
+                if (predictRes.ok) {
+                    const predictData = await predictRes.json();
+                    response = predictData.response || response;
+                    sentiment = predictData.sentiment || sentiment;
+                }
+            }
+        } catch (geminiError) {
+            return NextResponse.json({ error: "Gagal mendapatkan respons dari Gemini" }, { status: 500 });
         }
 
-        const { response, sentiment } = await res.json();
         if (!response) {
             return NextResponse.json({ error: "Respons tidak valid" }, { status: 500 });
         }
@@ -115,7 +162,7 @@ export async function POST(req: Request) {
                 chatSessionId: currentSessionId,
                 content: response,
                 role: "bot",
-                sentiment: sentiment
+                sentiment: sentiment,
             },
         });
 
@@ -132,7 +179,6 @@ export async function POST(req: Request) {
         });
 
         if (negativeCount % 3 === 0 && negativeCount !== 0) {
-            // tambahkan deletedAt di sesi chat nya
             await prisma.chatSession.update({
                 where: { id: currentSessionId },
                 data: { deletedAt: new Date() },
