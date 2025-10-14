@@ -127,8 +127,8 @@ export async function POST(req: Request) {
             const result = await model.generateContent({
                 contents,
                 generationConfig: {
-                    temperature: 0.2,
-                    topP: 0.5,
+                    temperature: 1,
+                    topP: 0.95,
                     maxOutputTokens: 512,
                     responseMimeType: "application/json",
                 },
