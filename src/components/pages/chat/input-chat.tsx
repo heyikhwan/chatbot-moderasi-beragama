@@ -12,8 +12,19 @@ const InputChat = ({ onSendMessage, isTyping }: InputChatProps) => {
   const [value, setValue] = useState("");
 
   const handleSend = () => {
-    onSendMessage(value);
+    const text = value.trim();
+
+    if (!text || isTyping) return;
+
+    onSendMessage(text);
     setValue("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
   };
 
   return (
@@ -23,15 +34,16 @@ const InputChat = ({ onSendMessage, isTyping }: InputChatProps) => {
         placeholder="Tuliskan pertanyaanmu disini..."
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), handleSend())}
+        onKeyDown={handleKeyDown}
       />
       <div className="flex justify-end items-center gap-2 mt-3">
         <Button
           className="cursor-pointer"
           onClick={handleSend}
-          disabled={(!value || value.trim() === "") || isTyping}
+          disabled={value.trim() === "" || isTyping}
         >
-          <SendHorizontal /> Kirim
+          <SendHorizontal className="mr-2 h-4 w-4" />
+          Kirim
         </Button>
       </div>
     </div>
