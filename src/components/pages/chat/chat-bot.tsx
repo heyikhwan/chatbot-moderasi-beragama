@@ -70,6 +70,10 @@ const ChatBot = () => {
             });
             const { chatSessionId, title } = await res.json();
             if (!chatSessionId) {
+                updateSessionMessages("temp", [
+                    ...messages,
+                    { success: false, content: "Gagal membuat sesi", role: "bot" as const, isNew: true },
+                ]);
                 return;
             }
             addSession({ id: chatSessionId, title, chats: [], temp: false });
@@ -85,6 +89,10 @@ const ChatBot = () => {
                 });
                 const { chatSessionId, title } = await res.json();
                 if (!chatSessionId) {
+                    updateSessionMessages(selectedSessionId, [
+                        ...messages,
+                        { success: false, content: "Gagal membuat sesi", role: "bot" as const, isNew: true },
+                    ]);
                     return;
                 }
                 setSessions(sessions.map(s => s.id === selectedSessionId ? { ...s, id: chatSessionId, temp: false, title } : s));
@@ -112,18 +120,19 @@ const ChatBot = () => {
             const data = await res.json();
             if (!res.ok) {
                 if (res.status === 403 && data.redirectTo) {
-                    // Lakukan POST ke logout endpoint
                     await fetch("/api/auth/logout", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                     });
-                    window.location.href = "/auth/login?error=Akun Anda diblokir."; 
+                    window.location.href = "/auth/login?error=Akun Anda diblokir.";
                     return;
                 }
                 updateSessionMessages(currentSessionId, [
                     ...newMessages,
                     { success: false, content: data.error || "Maaf, terjadi kesalahan", role: "bot" as const, isNew: true },
                 ]);
+                setIsWaitingResponse(false);
+                setIsTypingEffect(false);
                 return;
             }
 
@@ -149,7 +158,7 @@ const ChatBot = () => {
                 ...newMessages,
                 { success: false, content: "Maaf, terjadi kesalahan", role: "bot" as const, isNew: true },
             ]);
-            setIsWaitingResponse(false);
+            setIsWaitingResponse(false); // Reset animasi bounce
             setIsTypingEffect(false);
         }
     };
@@ -169,8 +178,7 @@ const ChatBot = () => {
                     </main>
                     <div className="sticky bottom-0 left-0 right-0 bg-background">
                         <div className="mx-auto w-full lg:max-w-3xl px-4 py-3">
-                            <InputChat onSendMessage={handleSendMessage} isTyping={isWaitingResponse || isTypingEffect}
-                            />
+                            <InputChat onSendMessage={handleSendMessage} isTyping={isWaitingResponse || isTypingEffect} />
                         </div>
                     </div>
                 </>
@@ -180,8 +188,7 @@ const ChatBot = () => {
                         <h2 className="font-semibold text-2xl">Apa hal yang ingin Anda diskusikan hari ini?</h2>
                     </div>
                     <div className="w-full lg:max-w-3xl">
-                        <InputChat onSendMessage={handleSendMessage} isTyping={isWaitingResponse || isTypingEffect}
-                        />
+                        <InputChat onSendMessage={handleSendMessage} isTyping={isWaitingResponse || isTypingEffect} />
                     </div>
                 </div>
             )}

@@ -101,10 +101,10 @@ export async function POST(req: Request) {
                 systemInstruction: {
                     role: "system",
                     parts: [{
-                        text: `Anda adalah bot AI bernama "Modera AI" yang dikembangkan oleh tim riset Universitas Islam Negri Sultan Syarif Kasim Riau.
+                        text: `Anda adalah bot bernama "Modera AI" yang dikembangkan oleh tim riset Universitas Islam Negeri Sultan Syarif Kasim Riau.
                             Tugas utama Anda adalah menjawab pertanyaan tentang moderasi beragama.
                             - Jika pertanyaan di luar topik, sampaikan bahwa Anda tidak tahu.
-                            - Jawab dengan jujur, ramah, dan singkat, layaknya seorang mahasiswa UIN.
+                            - Jawab dengan jujur, ramah, dan singkat.
 
                             Anda **hanya boleh merespon dalam format JSON**. Tidak ada teks tambahan, penjelasan, atau format lain.
 
@@ -150,11 +150,11 @@ export async function POST(req: Request) {
                 }
             }
         } catch (geminiError) {
-            return NextResponse.json({ error: "Gagal mendapatkan respons dari Gemini" }, { status: 500 });
+            return NextResponse.json({ error: "Terjadi kesalahan, silahkan coba lagi" }, { status: 500 });
         }
 
         if (!response) {
-            return NextResponse.json({ error: "Respons tidak valid" }, { status: 500 });
+            return NextResponse.json({ error: "Response tidak valid" }, { status: 500 });
         }
 
         await prisma.chat.create({
