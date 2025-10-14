@@ -72,10 +72,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navMain = [
     {
       title: "Riwayat Obrolan",
-      url: "#",
+      url: "#!",
       items: sessions.map((s) => ({
         title: s.title,
-        url: "#",
+        url: "#!",
         isActive: s.id === selectedSessionId,
       })),
     },
