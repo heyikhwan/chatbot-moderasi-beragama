@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Chat from "./chat";
 import InputChat from "./input-chat";
 import { useUser } from "@/hooks/useUser";
@@ -18,9 +18,9 @@ const ChatBot = () => {
         updateSessionMessages,
         updateSessionTitle,
     } = useChatStore();
-    const [isWaitingResponse, setIsWaitingResponse] = React.useState(false);
-    const [isTypingEffect, setIsTypingEffect] = React.useState(false);
-    const [isLoading, setIsLoading] = React.useState(true);
+    const [isWaitingResponse, setIsWaitingResponse] = useState(false);
+    const [isTypingEffect, setIsTypingEffect] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const messages = sessions.find((s) => s.id === selectedSessionId)?.chats || [];
 
