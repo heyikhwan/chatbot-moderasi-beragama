@@ -61,10 +61,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (updatedSessions.length > 0) {
         setSelectedSessionId(updatedSessions[0].id);
       } else {
-        setSelectedSessionId(null); // Reset ke null jika tidak ada sesi
+        setSelectedSessionId(null);
       }
     } catch (error) {
-      setSessions([]); // Kosongkan sesi jika gagal
+      setSessions([]);
       setSelectedSessionId(null);
     }
   };
