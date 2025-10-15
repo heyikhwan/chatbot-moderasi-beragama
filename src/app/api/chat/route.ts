@@ -92,51 +92,88 @@ export async function POST(req: Request) {
             },
         });
 
-        let response, sentiment;
+        let response = "Maaf, saya tidak bisa menjawab pertanyaan itu.";
+        let sentiment = "netral";
 
         try {
-            const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+            if (!process.env.GEMINI_API_KEY) {
+                throw new Error("❌ GEMINI_API_KEY belum diatur di .env");
+            }
+
+            const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
             const model = genAI.getGenerativeModel({
                 model: "gemini-2.5-flash",
                 systemInstruction: {
                     role: "system",
-                    parts: [{
-                        text: `Anda adalah bot bernama "Modera AI" yang dikembangkan oleh tim riset Universitas Islam Negeri Sultan Syarif Kasim Riau.
-                            Tugas utama Anda adalah menjawab pertanyaan tentang moderasi beragama.
-                            - Jika pertanyaan di luar topik, sampaikan bahwa Anda tidak tahu.
-                            - Jawab dengan jujur, ramah, dan singkat.
+                    parts: [
+                        {
+                            text: `Anda adalah bot bernama "Modera AI" yang dikembangkan oleh tim riset Universitas Islam Negeri Sultan Syarif Kasim Riau.
+                                Tugas utama Anda adalah menjawab pertanyaan tentang moderasi beragama.
+                                - Jika pertanyaan di luar topik, sampaikan bahwa Anda tidak tahu.
+                                - Jawab dengan jujur, ramah, dan singkat.
 
-                            Anda **hanya boleh merespon dalam format JSON**. Tidak ada teks tambahan, penjelasan, atau format lain.
+                                Anda **hanya boleh merespon dalam format JSON**. Tidak ada teks tambahan, penjelasan, atau format lain.
 
-                            Struktur JSON yang WAJIB Anda gunakan adalah:
-                            {
-                                "text": "[isi dari input user]",
-                                "response": "[jawaban Anda]",
-                                "sentiment": "[netral|positif|negatif]"
-                            }
+                                Struktur JSON yang WAJIB Anda gunakan adalah:
+                                {
+                                    "text": "[isi dari input user]",
+                                    "response": "[jawaban Anda]",
+                                    "sentiment": "[netral|positif|negatif]"
+                                }
 
-                            Penentuan sentimen:
-                            - Sentimen "netral" jika pertanyaan berhubungan spesifik dengan moderasi beragama.
-                            - Sentimen "negatif" jika input adalah ujaran kebencian, perkataan kasar, atau hal buruk lainnya.
-                            - Sentimen "positif" untuk input lainnya (basa-basi, pertanyaan di luar topik yang tidak negatif).`,
-                    }],
+                                Penentuan sentimen:
+                                - Sentimen "netral" jika pertanyaan berhubungan spesifik dengan moderasi beragama.
+                                - Sentimen "negatif" jika input adalah ujaran kebencian, perkataan kasar, atau hal buruk lainnya.
+                                - Sentimen "positif" untuk input lainnya (basa-basi, pertanyaan di luar topik yang tidak negatif).`,
+                        },
+                    ],
                 },
             });
+
             const contents = [{ role: "user", parts: [{ text: text.trim() }] }];
 
-            const result = await model.generateContent({
-                contents,
-                generationConfig: {
-                    temperature: 1,
-                    topP: 0.95,
-                    maxOutputTokens: 512,
-                    responseMimeType: "application/json",
-                },
-            });
+            let result;
+            try {
+                result = await generateWithRetry(model, {
+                    contents,
+                    generationConfig: {
+                        temperature: 1,
+                        topP: 0.95,
+                        maxOutputTokens: 512,
+                        responseMimeType: "application/json",
+                    },
+                });
+            } catch (err) {
+                const fallbackModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                result = await generateWithRetry(fallbackModel, {
+                    contents,
+                    generationConfig: {
+                        temperature: 1,
+                        topP: 0.95,
+                        maxOutputTokens: 512,
+                        responseMimeType: "application/json",
+                    },
+                });
+            }
 
-            const parsedResponse = JSON.parse(result.response.text());
-            response = parsedResponse.response;
-            sentiment = parsedResponse.sentiment;
+            let rawText = "";
+            try {
+                rawText = await result.response.text();
+            } catch (e) {
+                console.error("⚠️ Tidak bisa membaca response:", e);
+            }
+
+            let parsedResponse: any = {};
+            try {
+                parsedResponse = JSON.parse(rawText);
+            } catch (parseErr) {
+                const match = rawText.match(/"response"\s*:\s*"([^"]+)"/);
+                parsedResponse.response = match ? match[1] : response;
+                parsedResponse.sentiment = "netral";
+            }
+
+            response = parsedResponse.response || response;
+            sentiment = parsedResponse.sentiment || sentiment;
 
             if (sentiment === "netral") {
                 const predictRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/predict`, {
@@ -151,19 +188,21 @@ export async function POST(req: Request) {
                 }
             }
         } catch (geminiError) {
-            return NextResponse.json({ error: "Terjadi kesalahan, silahkan coba lagi" }, { status: 500 });
+            console.error("Gemini API Error:", geminiError);
+            return NextResponse.json(
+                { error: "Terjadi kesalahan, silakan coba lagi nanti." },
+                { status: 500 }
+            );
         }
 
-        if (!response) {
-            return NextResponse.json({ error: "Response tidak valid" }, { status: 500 });
-        }
+        if (!response) response = "Maaf, saya tidak bisa menjawab pertanyaan itu.";
 
         await prisma.chat.create({
             data: {
                 chatSessionId: currentSessionId,
                 content: response,
                 role: "bot",
-                sentiment: sentiment,
+                sentiment: sentiment as any,
             },
         });
 
@@ -180,12 +219,7 @@ export async function POST(req: Request) {
         });
 
         if (negativeCount % 3 === 0 && negativeCount !== 0) {
-            // await prisma.chatSession.update({
-            //     where: { id: currentSessionId },
-            //     data: { deletedAt: new Date() },
-            // });
-
-            const banDuration = 12 * 60 * 60 * 1000
+            const banDuration = 12 * 60 * 60 * 1000; // 12 jam
             await prisma.user.update({
                 where: { id: session.user.id },
                 data: { bannedUntil: new Date(Date.now() + banDuration) },
@@ -199,6 +233,21 @@ export async function POST(req: Request) {
         return NextResponse.json({ response, sentiment, chatSessionId: currentSessionId });
     } catch (error) {
         return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
+    }
+}
+
+async function generateWithRetry(model: any, payload: any, retries = 3, delay = 1000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            return await model.generateContent(payload);
+        } catch (err: any) {
+            const isOverloaded = err.message?.includes("503") || err.status === 503;
+            if (isOverloaded && i < retries - 1) {
+                await new Promise(r => setTimeout(r, delay * (i + 1)));
+            } else {
+                throw err;
+            }
+        }
     }
 }
 
