@@ -180,10 +180,10 @@ export async function POST(req: Request) {
         });
 
         if (negativeCount % 3 === 0 && negativeCount !== 0) {
-            await prisma.chatSession.update({
-                where: { id: currentSessionId },
-                data: { deletedAt: new Date() },
-            });
+            // await prisma.chatSession.update({
+            //     where: { id: currentSessionId },
+            //     data: { deletedAt: new Date() },
+            // });
 
             const banDuration = 24 * 60 * 60 * 1000
             await prisma.user.update({
