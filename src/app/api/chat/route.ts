@@ -110,9 +110,9 @@ export async function POST(req: Request) {
 
                             Struktur JSON yang WAJIB Anda gunakan adalah:
                             {
-                            "text": "[isi dari input user]",
-                            "response": "[jawaban Anda]",
-                            "sentiment": "[netral|positif|negatif]"
+                                "text": "[isi dari input user]",
+                                "response": "[jawaban Anda]",
+                                "sentiment": "[netral|positif|negatif]"
                             }
 
                             Penentuan sentimen:
@@ -133,6 +133,7 @@ export async function POST(req: Request) {
                     responseMimeType: "application/json",
                 },
             });
+
             const parsedResponse = JSON.parse(result.response.text());
             response = parsedResponse.response;
             sentiment = parsedResponse.sentiment;
@@ -184,7 +185,7 @@ export async function POST(req: Request) {
                 data: { deletedAt: new Date() },
             });
 
-            const banDuration = 7 * 24 * 60 * 60 * 1000;
+            const banDuration = 24 * 60 * 60 * 1000
             await prisma.user.update({
                 where: { id: session.user.id },
                 data: { bannedUntil: new Date(Date.now() + banDuration) },
