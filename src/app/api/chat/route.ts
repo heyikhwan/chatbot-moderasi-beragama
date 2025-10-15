@@ -185,7 +185,7 @@ export async function POST(req: Request) {
             //     data: { deletedAt: new Date() },
             // });
 
-            const banDuration = 24 * 60 * 60 * 1000
+            const banDuration = 12 * 60 * 60 * 1000
             await prisma.user.update({
                 where: { id: session.user.id },
                 data: { bannedUntil: new Date(Date.now() + banDuration) },
