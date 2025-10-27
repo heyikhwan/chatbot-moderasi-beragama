@@ -160,18 +160,18 @@ export async function POST(req: Request) {
             response = parsedResponse.response || response;
             sentiment = parsedResponse.sentiment || sentiment;
 
-            if (sentiment === "netral" && process.env.NEXT_PUBLIC_API_URL) {
-                const predictRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/predict`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text }),
-                });
-                if (predictRes.ok) {
-                    const predictData = await predictRes.json();
-                    response = predictData.response || response;
-                    sentiment = predictData.sentiment || sentiment;
-                }
-            }
+            // if (sentiment === "netral" && process.env.NEXT_PUBLIC_API_URL) {
+            //     const predictRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/predict`, {
+            //         method: "POST",
+            //         headers: { "Content-Type": "application/json" },
+            //         body: JSON.stringify({ text }),
+            //     });
+            //     if (predictRes.ok) {
+            //         const predictData = await predictRes.json();
+            //         response = predictData.response || response;
+            //         sentiment = predictData.sentiment || sentiment;
+            //     }
+            // }
 
         } catch (geminiError) {
             return NextResponse.json({ error: "Terjadi kesalahan, silahkan coba lagi." }, { status: 500 });
