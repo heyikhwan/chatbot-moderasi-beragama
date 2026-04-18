@@ -322,7 +322,7 @@ const ChatBot = () => {
     };
 
     return (
-        <div className="w-full lg:max-w-3xl mx-auto flex flex-col min-h-[calc(100vh-64px)]">
+        <div className="w-full max-w-3xl mx-auto flex flex-col min-h-[calc(100dvh-64px)] min-w-0">
             {isLoading || userLoading ? (
                 <div className="flex flex-1 items-center justify-center h-screen">
                     <div className="text-center flex items-center justify-center gap-2">
@@ -331,7 +331,7 @@ const ChatBot = () => {
                 </div>
             ) : messages.length > 0 ? (
                 <>
-                    <main className="p-4 pb-24 flex-1 overflow-y-auto">
+                    <main className="p-3 sm:p-4 pb-24 flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
                         <Chat
                             messages={messages}
                             isTyping={isWaitingResponse || isTypingEffect}
@@ -344,34 +344,34 @@ const ChatBot = () => {
                         />
                     </main>
                     <div className="sticky bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border">
-                        <div className="mx-auto w-full lg:max-w-3xl px-4 py-3">
+                        <div className="mx-auto w-full max-w-3xl px-3 sm:px-4 py-3">
                             <InputChat onSendMessage={handleSendMessage} isTyping={isWaitingResponse || isTypingEffect} />
                         </div>
                     </div>
                 </>
             ) : (
-                <div className="flex flex-1 flex-col items-center justify-center text-center px-4">
+                <div className="flex flex-1 flex-col items-center justify-center text-center px-3 sm:px-4">
                     <div className="mb-8">
-                        <h2 className="font-semibold text-2xl">Apa hal yang ingin Anda diskusikan hari ini?</h2>
+                        <h2 className="font-semibold text-xl sm:text-2xl">Apa hal yang ingin Anda diskusikan hari ini?</h2>
 
                         <div className="mt-5 w-full max-w-2xl mx-auto">
-                            <div className="flex items-center justify-center gap-2 overflow-x-auto py-1 px-1">
-                            {suggestedPrompts.map((prompt) => (
-                                <Button
-                                    key={prompt.id}
-                                    type="button"
-                                    variant="outline"
-                                    className="shrink-0 rounded-full h-9 px-4 text-xs sm:text-sm"
-                                    disabled={isWaitingResponse || isTypingEffect}
-                                    onClick={() => handleSendMessage(prompt.text)}
-                                >
-                                    {prompt.label}
-                                </Button>
-                            ))}
+                            <div className="flex flex-wrap items-center justify-center gap-2 py-1 px-1">
+                                {suggestedPrompts.map((prompt) => (
+                                    <Button
+                                        key={prompt.id}
+                                        type="button"
+                                        variant="outline"
+                                        className="rounded-full h-9 px-4 text-xs sm:text-sm whitespace-nowrap"
+                                        disabled={isWaitingResponse || isTypingEffect}
+                                        onClick={() => handleSendMessage(prompt.text)}
+                                    >
+                                        {prompt.label}
+                                    </Button>
+                                ))}
                             </div>
                         </div>
                     </div>
-                    <div className="w-full lg:max-w-3xl">
+                    <div className="w-full max-w-3xl">
                         <InputChat onSendMessage={handleSendMessage} isTyping={isWaitingResponse || isTypingEffect} />
                     </div>
                 </div>

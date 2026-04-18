@@ -241,13 +241,13 @@ const Chat = ({ messages, isTyping, isWaitingResponse, onRetry }: ChatProps) => 
     }, [messages, isTyping]);
 
     return (
-        <div ref={chatContainerRef} className="chat-container mb-2" aria-live="polite" aria-busy={isTyping}>
+        <div ref={chatContainerRef} className="chat-container mb-2 min-w-0 overflow-x-hidden" aria-live="polite" aria-busy={isTyping}>
             {messages.map((item, index) => {
                 const messageKey = `${item.createdAt ?? "na"}-${item.role}-${item.code ?? "ok"}-${item.content.slice(0, 24)}-${index}`;
 
                 return (
                 <div key={messageKey} className={`flex ${item.role === "user" ? "justify-end" : "justify-start"} mb-5`}>
-                    <div className={`flex flex-col ${item.role === "user" ? "items-end" : "items-start"} max-w-[80%]`}>
+                    <div className={`flex flex-col ${item.role === "user" ? "items-end" : "items-start"} max-w-[92%] sm:max-w-[85%] lg:max-w-[80%] min-w-0`}>
                         <div className="text-[11px] text-muted-foreground mb-1 px-1">
                             {item.role === "user" ? "Anda" : "Modera AI"} {formatTime(item.createdAt)}
                         </div>
@@ -258,7 +258,7 @@ const Chat = ({ messages, isTyping, isWaitingResponse, onRetry }: ChatProps) => 
                                     : item.success
                                         ? "bg-muted text-foreground border border-border"
                                         : "bg-destructive/10 text-foreground border border-destructive/20"
-                            } rounded-2xl py-2.5 px-4`}
+                            } rounded-2xl py-2.5 px-3 sm:px-4 break-words overflow-x-auto`}
                         >
                             <div className={`flex items-start gap-3 ${!item.success && "text-destructive"}`}>
                                 {!item.success && <TriangleAlert className="w-4 h-4 flex-shrink-0 mt-1" />}
