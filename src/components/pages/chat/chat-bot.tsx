@@ -350,18 +350,18 @@ const ChatBot = () => {
                     </div>
                 </>
             ) : (
-                <div className="flex flex-1 flex-col items-center justify-center text-center px-3 sm:px-4">
-                    <div className="mb-8">
-                        <h2 className="font-semibold text-xl sm:text-2xl">Apa hal yang ingin Anda diskusikan hari ini?</h2>
+                <div className="flex flex-1 flex-col items-center justify-center text-center px-3 sm:px-4 min-w-0">
+                    <div className="mb-6 sm:mb-8 w-full">
+                        <h2 className="font-semibold text-lg leading-snug sm:text-2xl">Apa hal yang ingin Anda diskusikan hari ini?</h2>
 
-                        <div className="mt-5 w-full max-w-2xl mx-auto">
+                        <div className="mt-5 w-full max-w-2xl mx-auto min-w-0">
                             <div className="flex flex-wrap items-center justify-center gap-2 py-1 px-1">
                                 {suggestedPrompts.map((prompt) => (
                                     <Button
                                         key={prompt.id}
                                         type="button"
                                         variant="outline"
-                                        className="rounded-full h-9 px-4 text-xs sm:text-sm whitespace-nowrap"
+                                        className="rounded-full h-auto min-h-9 px-3 sm:px-4 py-2 text-xs sm:text-sm whitespace-normal text-center leading-tight max-w-full"
                                         disabled={isWaitingResponse || isTypingEffect}
                                         onClick={() => handleSendMessage(prompt.text)}
                                     >
