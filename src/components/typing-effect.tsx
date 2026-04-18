@@ -1,26 +1,39 @@
 import { useEffect, useState } from "react"
 
-export function TypingEffect({ text, speed = 40 }: { text: string; speed?: number }) {
+export function TypingEffect({ text, speed = 22 }: { text: string; speed?: number }) {
   const [displayedText, setDisplayedText] = useState("")
+  const [isSkipped, setIsSkipped] = useState(false)
 
   useEffect(() => {
-    let isCancelled = false
+    setDisplayedText("")
+    setIsSkipped(false)
 
-    async function typeText() {
-      setDisplayedText("")
-      for (let i = 0; i < text.length; i++) {
-        if (isCancelled) break
-        setDisplayedText((prev) => prev + text[i])
-        await new Promise((resolve) => setTimeout(resolve, speed))
+    if (!text) return
+
+    let i = 0
+    const interval = setInterval(() => {
+      i += 1
+      setDisplayedText(text.slice(0, i))
+
+      if (i >= text.length) {
+        clearInterval(interval)
       }
-    }
-
-    typeText()
+    }, speed)
 
     return () => {
-      isCancelled = true
+      clearInterval(interval)
     }
   }, [text, speed])
 
-  return <span>{displayedText}</span>
+  useEffect(() => {
+    if (isSkipped) {
+      setDisplayedText(text)
+    }
+  }, [isSkipped, text])
+
+  return (
+    <span onClick={() => setIsSkipped(true)} className="cursor-text">
+      {displayedText}
+    </span>
+  )
 }

@@ -69,18 +69,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
   };
 
-  const navMain = [
-    {
-      title: "Riwayat Obrolan",
-      url: "#!",
-      items: sessions.map((s) => ({
-        title: s.title,
-        url: "#!",
-        isActive: s.id === selectedSessionId,
-      })),
-    },
-  ];
-
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -91,48 +79,51 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
       <SidebarContent className="gap-0">
-        {navMain.map((item, index) => (
-          <SidebarGroup key={index}>
-            <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {item.items.map((item, index) => (
-                  <SidebarMenuItem key={index} className="flex items-center justify-between">
-                    <SidebarMenuButton asChild isActive={item.isActive}>
-                      <a href={item.url} onClick={() => setSelectedSessionId(sessions[index].id)}>
-                        {item.title}
-                      </a>
-                    </SidebarMenuButton>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="ml-2">
-                          <Trash2 className="h-4 w-4 text-muted-foreground" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Hapus obrolan?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Ini akan menghapus seluruh obrolan.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Batalkan</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeleteSession(sessions[index].id)}
-                            className="bg-destructive hover:bg-destructive/80"
-                          >
-                            Hapus
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+        <SidebarGroup>
+          <SidebarGroupLabel>Riwayat Obrolan</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {sessions.map((chatSession) => (
+                <SidebarMenuItem key={chatSession.id} className="flex items-center justify-between gap-1">
+                  <SidebarMenuButton asChild isActive={chatSession.id === selectedSessionId}>
+                    <a
+                      href="#!"
+                      onClick={() => setSelectedSessionId(chatSession.id)}
+                      title={chatSession.title}
+                      className="truncate"
+                    >
+                      {chatSession.title}
+                    </a>
+                  </SidebarMenuButton>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon" className="ml-1 size-9 shrink-0">
+                        <Trash2 className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Hapus obrolan?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Ini akan menghapus seluruh obrolan.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Batalkan</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDeleteSession(chatSession.id)}
+                          className="bg-destructive hover:bg-destructive/80"
+                        >
+                          Hapus
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

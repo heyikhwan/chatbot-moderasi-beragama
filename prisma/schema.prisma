@@ -18,6 +18,8 @@ model chat {
   chatSession   chatSession     @relation(fields: [chatSessionId], references: [id], map: "Chat_chatSessionId_fkey")
 
   @@index([chatSessionId], map: "Chat_chatSessionId_fkey")
+  @@index([chatSessionId, createdAt], map: "Chat_chatSessionId_createdAt_idx")
+  @@index([chatSessionId, sentiment], map: "Chat_chatSessionId_sentiment_idx")
 }
 
 model chatSession {
@@ -30,6 +32,7 @@ model chatSession {
   user      user      @relation(fields: [userId], references: [id], map: "ChatSession_userId_fkey")
 
   @@index([userId], map: "ChatSession_userId_fkey")
+  @@index([userId, createdAt], map: "ChatSession_userId_createdAt_idx")
 }
 
 model user {

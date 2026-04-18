@@ -3,7 +3,16 @@ import { create } from "zustand";
 interface ChatSession {
   id: string;
   title: string;
-  chats: { success: boolean; content: string; role: "user" | "bot"; sentiment?: string; isNew?: boolean }[];
+  chats: {
+    success: boolean;
+    content: string;
+    role: "user" | "bot";
+    sentiment?: string;
+    isNew?: boolean;
+    createdAt?: string;
+    retryable?: boolean;
+    code?: string;
+  }[];
   temp?: boolean;
 }
 
